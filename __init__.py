@@ -43,7 +43,7 @@ def test():
 
 if "__main__" == __name__:
     #params = sys.argv
-    create_binary_files()
+    #create_binary_files()
     #x, y = get_files()
-    #main()
+    main()
     #test()

@@ -106,8 +106,8 @@ class Lenet5(object):
                 #iter = (epoch - 1) * n_train_batches + mini_batch_index
 
                 #if (iter + 1) % self.frequency == 0:
-            #test_losses = [self.test_model(i) for i in range(n_test_batches)]
-            #test_score = np.mean(test_losses)
+            test_losses = [self.test_model(i) for i in range(n_test_batches)]
+            test_score = np.mean(test_losses)
 
-            #print("Época: ", epoch, " testError: ", test_score * 100, "%")
-            print("Época: ", epoch, " trainError: ", np.mean(errors) * 100, "%")
+            print("Época: ", epoch, " testError: ", test_score * 100, "%")
+            print("\tÉpoca: ", epoch, " trainError: ", np.mean(errors) * 100, "%")
