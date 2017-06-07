@@ -1,7 +1,6 @@
 import numpy as np
 from theano.tensor.nnet import conv2d
 from theano import shared, config
-from theano.tensor.signal import pool
 from theano.tensor.nnet import sigmoid
 
 

@@ -1,6 +1,7 @@
 import numpy as np
 import theano.tensor as T
-from theano import shared, config
+from theano import shared, config, function
+from sklearn.metrics import f1_score
 
 
 class FullyConnected(object):
@@ -28,8 +29,5 @@ class FullyConnected(object):
     def errors(self, y):
         return T.mean(T.neq(self.y_pred, y))
 
-    def f1(self, y):
-        precision = T.mean(T.eq(self.y_pred, y))
-        recall = T.sum(T.eq(self.y_pred, y) / y.shape[0])
-
-        return 2 * ((precision * recall) / (precision + recall))
+    def confusion_matrix(self, y):
+        return T.nnet.confusion_matrix(y, self.y_pred)[0]

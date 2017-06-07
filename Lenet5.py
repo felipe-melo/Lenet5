@@ -89,7 +89,7 @@ class Lenet5(object):
 
         self.test_model = function(
             inputs=[index],
-            outputs=[self.f4.errors(self.y)],
+            outputs=[self.f4.confusion_matrix(self.y), self.f4.errors(self.y)],
             givens={
                 self.x: test_set_x[index * self.batch_size:(index + 1) * self.batch_size],
                 self.y: test_set_y[index * self.batch_size:(index + 1) * self.batch_size]
@@ -99,15 +99,34 @@ class Lenet5(object):
         epoch = 0
         while epoch < epochs:
             epoch += 1
-            errors = []
+            #errors = []
             for mini_batch_index in range(n_train_batches):
-                error = self.train(mini_batch_index)
-                errors.append(error)
-                #iter = (epoch - 1) * n_train_batches + mini_batch_index
+                #error = \
+                self.train(mini_batch_index)
+                #errors.append(error)
 
-                #if (iter + 1) % self.frequency == 0:
-            test_losses = [self.test_model(i) for i in range(n_test_batches)]
-            test_score = np.mean(test_losses)
+            #test_error = [self.test_model(i) for i in range(n_test_batches)]
+            #test_score = np.mean(test_error)
 
-            print("Época: ", epoch, " testError: ", test_score * 100, "%")
-            print("\tÉpoca: ", epoch, " trainError: ", np.mean(errors) * 100, "%")
+            test_error = []
+            confucion_matrix = np.zeros((10, 10), dtype='int')
+
+            for i in range(n_test_batches):
+                confu, error = self.test_model(i)
+                confucion_matrix += confu
+                test_error.append(error)
+
+            #test_score = np.mean(test_error)
+            test_accuracy = confucion_matrix.diagonal().sum() / confucion_matrix.sum()
+
+            '''for i in range(10):
+                precision = confucion_matrix[i, i] / (confucion_matrix[:, i].sum())
+                recall = confucion_matrix[i, i] / (confucion_matrix[i, :].sum())
+                f1_score = 2 * (precision * recall) / (precision + recall)
+                print("Precision class:", i, ":", precision)
+                print("Recall class:", i, ":", recall)
+                print("F1 score class:", i, ":", f1_score)'''
+
+            print("Epocha:", epoch, "test accuracy:", test_accuracy * 100, "%")
+
+            print("-------------------------------------------------------------------")

@@ -23,7 +23,7 @@ def main(batch_size=200, epocha=1, eta=0.1):
 
     t1 = time.time()
     lenet5 = Lenet5()
-    lenet5.run_train(database, epochs=20)
+    lenet5.run_train(database, epochs=50)
     print(time.time() - t1)
 
 
