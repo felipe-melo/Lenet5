@@ -3,6 +3,7 @@ import theano.tensor as T
 from ConvPoolLayer import ConvPoolLayer, np
 from FullyConnected import FullyConnected
 from HiddenLayer import HiddenLayer
+import time
 
 rng = np.random
 
@@ -65,7 +66,7 @@ class Lenet5(object):
         self.train = None
         self.test_model = None
 
-    def run_train(self, database, epochs=50, eta=0.1):
+    def run_train(self, database, epochs=25, eta=0.3):
 
         index = T.lscalar()
 
@@ -79,7 +80,7 @@ class Lenet5(object):
 
         self.train = function(
             inputs=[index],
-            outputs=[self.f4.errors(self.y)],
+            outputs=[self.f4.confusion_matrix(self.y)],
             updates=updates,
             givens={
                 self.x: train_set_x[index * self.batch_size:(index + 1) * self.batch_size],
@@ -89,44 +90,47 @@ class Lenet5(object):
 
         self.test_model = function(
             inputs=[index],
-            outputs=[self.f4.confusion_matrix(self.y), self.f4.errors(self.y)],
+            outputs=[self.f4.confusion_matrix(self.y)],
             givens={
                 self.x: test_set_x[index * self.batch_size:(index + 1) * self.batch_size],
                 self.y: test_set_y[index * self.batch_size:(index + 1) * self.batch_size]
             }
         )
 
+        print("trainning...")
+        t1 = time.time()
+
         epoch = 0
         while epoch < epochs:
             epoch += 1
-            #errors = []
-            for mini_batch_index in range(n_train_batches):
-                #error = \
-                self.train(mini_batch_index)
-                #errors.append(error)
 
-            #test_error = [self.test_model(i) for i in range(n_test_batches)]
-            #test_score = np.mean(test_error)
-
-            test_error = []
             confucion_matrix = np.zeros((10, 10), dtype='int')
 
-            for i in range(n_test_batches):
-                confu, error = self.test_model(i)
-                confucion_matrix += confu
-                test_error.append(error)
+            for mini_batch_index in range(n_train_batches):
+                confu = self.train(mini_batch_index)
+                confucion_matrix += confu[0]
 
-            #test_score = np.mean(test_error)
-            test_accuracy = confucion_matrix.diagonal().sum() / confucion_matrix.sum()
+            print("epocha:", epoch, "accuracy:", confucion_matrix.diagonal().sum() / confucion_matrix.sum())
 
-            '''for i in range(10):
-                precision = confucion_matrix[i, i] / (confucion_matrix[:, i].sum())
-                recall = confucion_matrix[i, i] / (confucion_matrix[i, :].sum())
-                f1_score = 2 * (precision * recall) / (precision + recall)
-                print("Precision class:", i, ":", precision)
-                print("Recall class:", i, ":", recall)
-                print("F1 score class:", i, ":", f1_score)'''
+        print("trainning time:", time.time() - t1)
 
-            print("Epocha:", epoch, "test accuracy:", test_accuracy * 100, "%")
+        print("testing...")
+        t1 = time.time()
+        confucion_matrix = np.zeros((10, 10), dtype='int')
 
-            print("-------------------------------------------------------------------")
+        for i in range(n_test_batches):
+            confu = self.test_model(i)
+            confucion_matrix += confu[0]
+
+        test_accuracy = confucion_matrix.diagonal().sum() / confucion_matrix.sum()
+
+        for i in range(10):
+            precision = confucion_matrix[i, i] / (confucion_matrix[:, i].sum())
+            recall = confucion_matrix[i, i] / (confucion_matrix[i, :].sum())
+            f1_score = 2 * (precision * recall) / (precision + recall)
+            print("Precision class:", i, ":", precision)
+            print("Recall class:", i, ":", recall)
+            print("F1 score class:", i, ":", f1_score)
+
+        print("Epocha:", epoch, "test accuracy:", test_accuracy * 100, "%")
+        print("testing time", time.time() - t1)

@@ -2,7 +2,6 @@ from ReadDatabase import *
 from Lenet5 import Lenet5
 from PIL import Image
 import matplotlib.pyplot as plt
-import time
 import os
 
 rng = np.random
@@ -21,10 +20,8 @@ def main(batch_size=200, epocha=1, eta=0.1):
     #train_set_x, train_set_y = database[0]
     #test_set_x, test_set_y = database[1]
 
-    t1 = time.time()
     lenet5 = Lenet5()
-    lenet5.run_train(database, epochs=50)
-    print(time.time() - t1)
+    lenet5.run_train(database, epochs=30)
 
 
 def test():
