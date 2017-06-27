@@ -5,12 +5,19 @@ import numpy as np
 from theano import config, shared
 import theano.tensor as T
 import ast
+import os
+import tarfile
+import sys
+from urllib.request import urlretrieve
+data_root = '../database'
 
 
 train_images_file = "database/train-images.idx3-ubyte"
 train_labels_file = "database/train-labels.idx1-ubyte"
 test_images_file = "database/t10k-images.idx3-ubyte"
 test_labels_file = "database/t10k-labels.idx1-ubyte"
+
+url = 'https://commondatastorage.googleapis.com/books1000/'
 
 
 def read_files(train_images=train_images_file, train_labels=train_labels_file, test_images=test_images_file,
@@ -106,3 +113,102 @@ def get_files():
         break
 
     return data_x, data_y
+
+
+def download_no_mnist(filename, expected_bytes, force=False):
+    """Download a file if not present, and make sure it's the right size."""
+    dest_filename = os.path.join(data_root, filename)
+    if force or not os.path.exists(dest_filename):
+        print('Attempting to download:', filename)
+        filename, _ = urlretrieve(url + filename, dest_filename)
+        print('\nDownload Complete!')
+    statinfo = os.stat(dest_filename)
+    if statinfo.st_size == expected_bytes:
+        print('Found and verified', dest_filename)
+    else:
+        raise Exception(
+            'Failed to verify ' + dest_filename + '. Can you get to it with a browser?')
+    return dest_filename
+
+num_classes = 10
+np.random.seed(133)
+
+
+def maybe_extract(filename, force=False):
+    root = os.path.splitext(os.path.splitext(filename)[0])[0]  # remove .tar.gz
+    if os.path.isdir(root) and not force:
+        # You may override by setting force=True.
+        print('%s already present - Skipping extraction of %s.' % (root, filename))
+    else:
+        print('Extracting data for %s. This may take a while. Please wait.' % root)
+        tar = tarfile.open(filename)
+        sys.stdout.flush()
+        tar.extractall(data_root)
+        tar.close()
+    data_folders = [
+        os.path.join(root, d) for d in sorted(os.listdir(root))
+        if os.path.isdir(os.path.join(root, d))]
+    if len(data_folders) != num_classes:
+        raise Exception(
+            'Expected %d folders, one per class. Found %d instead.' % (
+                num_classes, len(data_folders)))
+    print(data_folders)
+    return data_folders
+
+
+image_size = 28  # Pixel width and height.
+pixel_depth = 255.0  # Number of levels per pixel.
+
+
+def load_letter(folder, min_num_images):
+    """Load the data for a single letter label."""
+    image_files = os.listdir(folder)
+    dataset = np.ndarray(shape=(len(image_files), image_size, image_size),
+                         dtype=np.float32)
+    print(folder)
+    num_images = 0
+    for image in image_files:
+        image_file = os.path.join(folder, image)
+        try:
+            image_data = (ndimage.imread(image_file).astype(float) -
+                          pixel_depth / 2) / pixel_depth
+            if image_data.shape != (image_size, image_size):
+                raise Exception('Unexpected image shape: %s' % str(image_data.shape))
+            dataset[num_images, :, :] = image_data
+            num_images = num_images + 1
+        except IOError as e:
+            print('Could not read:', image_file, ':', e, '- it\'s ok, skipping.')
+
+    dataset = dataset[0:num_images, :, :]
+    if num_images < min_num_images:
+        raise Exception('Many fewer images than expected: %d < %d' %
+                        (num_images, min_num_images))
+
+    print('Full dataset tensor:', dataset.shape)
+    print('Mean:', np.mean(dataset))
+    print('Standard deviation:', np.std(dataset))
+    return dataset
+
+
+def maybe_pickle(data_folders, min_num_images_per_class, force=False):
+    dataset_names = []
+    for folder in data_folders:
+        set_filename = folder + '.pickle'
+        dataset_names.append(set_filename)
+        if os.path.exists(set_filename) and not force:
+            # You may override by setting force=True.
+            print('%s already present - Skipping pickling.' % set_filename)
+        else:
+            print('Pickling %s.' % set_filename)
+            dataset = load_letter(folder, min_num_images_per_class)
+            try:
+                with open(set_filename, 'wb') as f:
+                    pickle.dump(dataset, f, pickle.HIGHEST_PROTOCOL)
+            except Exception as e:
+                print('Unable to save data to', set_filename, ':', e)
+
+    return dataset_names
+
+
+train_datasets = maybe_pickle(train_folders, 45000)
+test_datasets = maybe_pickle(test_folders, 1800)

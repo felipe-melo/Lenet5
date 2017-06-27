@@ -1,8 +1,7 @@
-from ReadDatabase import *
-from Lenet5 import Lenet5
-from PIL import Image
 import matplotlib.pyplot as plt
-import os
+
+from ReadDatabase import *
+from lenet_5.Lenet5 import Lenet5
 
 rng = np.random
 

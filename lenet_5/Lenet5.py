@@ -1,9 +1,11 @@
-from theano import function
+import time
+
 import theano.tensor as T
 from ConvPoolLayer import ConvPoolLayer, np
 from FullyConnected import FullyConnected
-from HiddenLayer import HiddenLayer
-import time
+from theano import function
+
+from lenet_5.HiddenLayer import HiddenLayer
 
 rng = np.random
 
