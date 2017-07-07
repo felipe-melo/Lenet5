@@ -1,8 +1,8 @@
 import time
 
 import theano.tensor as T
-from ConvPoolLayer import ConvPoolLayer, np
-from FullyConnected import FullyConnected
+from lenet_5.ConvPoolLayer import ConvPoolLayer, np
+from lenet_5.FullyConnected import FullyConnected
 from theano import function
 
 from lenet_5.HiddenLayer import HiddenLayer
@@ -68,34 +68,45 @@ class Lenet5(object):
         self.train = None
         self.test_model = None
 
-    def run_train(self, database, epochs=25, eta=0.3):
+    def run_train(self, train_dataset, train_labels, test_dataset, test_labels, valid_dataset=None, valid_labels=None,
+                  epochs=25, eta=0.3):
 
         index = T.lscalar()
 
-        train_set_x, train_set_y = database[0]
-        test_set_x, test_set_y = database[1]
-
-        n_train_batches = train_set_x.get_value(borrow=True).shape[0] // self.batch_size
-        n_test_batches = test_set_x.get_value(borrow=True).shape[0] // self.batch_size
+        n_train_batches = train_dataset.get_value(borrow=True).shape[0] // self.batch_size
+        n_test_batches = test_dataset.get_value(borrow=True).shape[0] // self.batch_size
+        if valid_dataset is not None:
+            n_valid_batches = valid_dataset.get_value(borrow=True).shape[0] // self.batch_size
 
         updates = [(param_i, param_i - eta * grad_i) for param_i, grad_i in zip(self.params, self.grads)]
 
         self.train = function(
             inputs=[index],
             outputs=[self.f4.confusion_matrix(self.y)],
+            #outputs=[self.f4.output],
             updates=updates,
             givens={
-                self.x: train_set_x[index * self.batch_size:(index + 1) * self.batch_size],
-                self.y: train_set_y[index * self.batch_size:(index + 1) * self.batch_size]
+                self.x: train_dataset[index * self.batch_size:(index + 1) * self.batch_size],
+                self.y: train_labels[index * self.batch_size:(index + 1) * self.batch_size]
             }
         )
+
+        if valid_dataset is not None:
+            validate_model = function(
+                inputs=[index],
+                outputs=[self.f4.confusion_matrix(self.y)],
+                givens={
+                    self.x: valid_dataset[index * self.batch_size: (index + 1) * self.batch_size],
+                    self.y: valid_labels[index * self.batch_size: (index + 1) * self.batch_size]
+                }
+            )
 
         self.test_model = function(
             inputs=[index],
             outputs=[self.f4.confusion_matrix(self.y)],
             givens={
-                self.x: test_set_x[index * self.batch_size:(index + 1) * self.batch_size],
-                self.y: test_set_y[index * self.batch_size:(index + 1) * self.batch_size]
+                self.x: test_dataset[index * self.batch_size:(index + 1) * self.batch_size],
+                self.y: test_labels[index * self.batch_size:(index + 1) * self.batch_size]
             }
         )
 
