@@ -40,4 +40,4 @@ class ConvPoolLayer(object):
 
         #pooled_out = pool.pool_2d(input=conv_output, ws=self.pool_size, mode='sum', ignore_border=True)
 
-        self.output = self.activation_fn(conv_output+ self.bias.dimshuffle('x', 0, 'x', 'x'))
+        self.output = self.activation_fn(conv_output + self.bias.dimshuffle('x', 0, 'x', 'x'))

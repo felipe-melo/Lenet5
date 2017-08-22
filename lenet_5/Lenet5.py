@@ -12,9 +12,11 @@ rng = np.random
 
 class Lenet5(object):
 
-    def __init__(self, batch_size=150):
+    def __init__(self, batch_size=150, labels=10):
         self.x = T.matrix('x')
         self.y = T.ivector('y')
+
+        self.labels = labels
 
         self.frequency = 100
         self.batch_size = batch_size
@@ -57,7 +59,7 @@ class Lenet5(object):
             rng,
             _input=self.h3.output,
             n_in=120,
-            n_out=10
+            n_out=self.labels
         )
 
         self.cost = -T.mean(T.log(self.f4.output)[T.arange(self.y.shape[0]), self.y])
@@ -117,10 +119,11 @@ class Lenet5(object):
         while epoch < epochs:
             epoch += 1
 
-            confucion_matrix = np.zeros((10, 10), dtype='int')
+            confucion_matrix = np.zeros((self.labels, self.labels), dtype='int')
 
             for mini_batch_index in range(n_train_batches):
                 confu = self.train(mini_batch_index)
+                print(confu)
                 confucion_matrix += confu[0]
 
             print("epocha:", epoch, "accuracy:", confucion_matrix.diagonal().sum() / confucion_matrix.sum())
@@ -129,7 +132,7 @@ class Lenet5(object):
 
         print("testing...")
         t1 = time.time()
-        confucion_matrix = np.zeros((10, 10), dtype='int')
+        confucion_matrix = np.zeros((self.labels, self.labels), dtype='int')
 
         for i in range(n_test_batches):
             confu = self.test_model(i)
@@ -137,7 +140,7 @@ class Lenet5(object):
 
         test_accuracy = confucion_matrix.diagonal().sum() / confucion_matrix.sum()
 
-        for i in range(10):
+        for i in range(self.labels):
             precision = confucion_matrix[i, i] / (confucion_matrix[:, i].sum())
             recall = confucion_matrix[i, i] / (confucion_matrix[i, :].sum())
             f1_score = 2 * (precision * recall) / (precision + recall)

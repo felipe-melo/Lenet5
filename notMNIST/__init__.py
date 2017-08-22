@@ -1,11 +1,12 @@
 from notMNIST.notMNISTDataset import download_no_mnist, maybe_extract, maybe_pickle, plotingSomeImg, merge_datasets, np, \
-    pickle, data_root, os, extract_overlap_hash_where, sanitize, save_pickle_file, plt, create_dataset, load_dataset
+    pickle, os, extract_overlap_hash_where, sanitize, save_pickle_file, plt, create_dataset, load_dataset
 from lenet_5.Lenet5 import Lenet5
+from util.Constants import Constants
 
 
 def my_test():
 
-    pickle_file = os.path.join(data_root, 'notMNIST.pickle')
+    pickle_file = os.path.join(Constants.dataset_root, 'notMNIST.pickle')
 
     fileObj = open(pickle_file, 'rb')
 
@@ -21,10 +22,6 @@ def my_test():
     print('Training:', train_dataset.shape, 'Label:', train_labels.shape)
     print('Validation:', valid_dataset.shape, 'Label:', valid_labels.shape)
     print('Testing:', test_dataset.shape, 'Label:', test_labels.shape)
-
-    '''plotingSomeImg(train_dataset)
-    plotingSomeImg(valid_dataset)
-    plotingSomeImg(test_dataset)'''
 
     for i in range(10):
         sample_idx = np.random.randint(train_dataset.shape[0])  # pick a random image index
@@ -54,12 +51,8 @@ def my_test():
 def main():
     train_set_x, train_set_y, valid_x, valid_y, test_set_x, test_set_y = load_dataset()
 
-    '''database = read_files()
-    train_set_x, train_set_y = database[0]
-    test_set_x, test_set_y = database[1]'''
-
     lenet5 = Lenet5()
-    lenet5.run_train(train_set_x, train_set_y, test_set_x, test_set_y, valid_dataset=valid_x, valid_labels=valid_y, epochs=30)
+    lenet5.run_train(train_set_x, train_set_y, test_set_x, test_set_y, valid_dataset=valid_x, valid_labels=valid_y, epochs=5)
 
 
 if "__main__" == __name__:

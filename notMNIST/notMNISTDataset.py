@@ -5,19 +5,19 @@ import tarfile
 from theano import config, shared
 import theano.tensor as T
 import sys
+from util.Constants import Constants
 import numpy as np
 from urllib.request import urlretrieve
 from six.moves import cPickle as pickle
 import matplotlib.pyplot as plt
 
 
-data_root = 'database'
 url = 'https://commondatastorage.googleapis.com/books1000/'
 
 
 def download_no_mnist(filename, expected_bytes, force=False):
     """Download a file if not present, and make sure it's the right size."""
-    dest_filename = os.path.join(data_root, filename)
+    dest_filename = os.path.join(Constants.dataset_root, filename)
     if force or not os.path.exists(dest_filename):
         print('Attempting to download:', filename)
         filename, _ = urlretrieve(url + filename, dest_filename)
@@ -43,7 +43,7 @@ def maybe_extract(filename, force=False):
         print('Extracting data for %s. This may take a while. Please wait.' % root)
         tar = tarfile.open(filename)
         sys.stdout.flush()
-        tar.extractall(data_root)
+        tar.extractall(Constants.dataset_root)
         tar.close()
     data_folders = [
         os.path.join(root, d) for d in sorted(os.listdir(root))
@@ -195,6 +195,7 @@ def sanitize(dataset_1, dataset_2, labels_1):
 
 
 def save_pickle_file(train_dataset, train_labels, valid_dataset, valid_labels, test_dataset, test_labels):
+
     def randomize(dataset, labels):
         permutation = np.random.permutation(labels.shape[0])
         shuffled_dataset = dataset[permutation, :, :]
@@ -205,7 +206,7 @@ def save_pickle_file(train_dataset, train_labels, valid_dataset, valid_labels, t
     test_dataset, test_labels = randomize(test_dataset, test_labels)
     valid_dataset, valid_labels = randomize(valid_dataset, valid_labels)
 
-    pickle_file = os.path.join(data_root, 'notMNIST.pickle')
+    pickle_file = os.path.join(Constants.dataset_root, 'notMNIST.pickle')
 
     try:
         f = open(pickle_file, 'wb')
@@ -280,7 +281,7 @@ def create_dataset():
 
 
 def load_dataset():
-    pickle_file = os.path.join(data_root, 'notMNIST.pickle')
+    pickle_file = os.path.join(Constants.dataset_root, 'notMNIST.pickle')
 
     fileObj = open(pickle_file, 'rb')
 
@@ -293,6 +294,8 @@ def load_dataset():
     test_dataset = allDatabase['test_dataset']
     test_labels = allDatabase['test_labels']
 
+    fileObj.close()
+
     train_x = shared(np.asarray(train_dataset, dtype=config.floatX), borrow=True)
     train_y = shared(np.asarray(train_labels, dtype=config.floatX), borrow=True)
     valid_x = shared(np.asarray(valid_dataset, dtype=config.floatX), borrow=True)
@@ -300,9 +303,9 @@ def load_dataset():
     test_x = shared(np.asarray(test_dataset, dtype=config.floatX), borrow=True)
     test_y = shared(np.asarray(test_labels, dtype=config.floatX), borrow=True)
 
-    #test_y = test_y.flatten()
-    #train_y = train_y.flatten()
-    #valid_y = train_y.flatten()
+    test_y = test_y.flatten()
+    train_y = train_y.flatten()
+    valid_y = train_y.flatten()
 
     test_y = T.cast(test_y, 'int32')
     train_y = T.cast(train_y, 'int32')

@@ -4,17 +4,16 @@ import struct
 import numpy as np
 from theano import config, shared
 import theano.tensor as T
-import ast
 import os
+from util.Constants import Constants
 import matplotlib.pyplot as plt
 from six.moves import cPickle as pickle
 
-data_root = 'database'
 
-train_images_file = "database/train-images.idx3-ubyte"
-train_labels_file = "database/train-labels.idx1-ubyte"
-test_images_file = "database/t10k-images.idx3-ubyte"
-test_labels_file = "database/t10k-labels.idx1-ubyte"
+train_images_file = Constants.dataset_root + "train-images.idx3-ubyte"
+train_labels_file = Constants.dataset_root + "train-labels.idx1-ubyte"
+test_images_file = Constants.dataset_root + "t10k-images.idx3-ubyte"
+test_labels_file = Constants.dataset_root + "t10k-labels.idx1-ubyte"
 
 
 def read_files(train_images=train_images_file, train_labels=train_labels_file, test_images=test_images_file,
@@ -128,7 +127,7 @@ def plotingSomeImg():
 
 
 def load_dataset():
-    pickle_file = os.path.join('database', 'MNIST.pickle')
+    pickle_file = os.path.join(Constants.dataset_root, 'MNIST.pickle')
 
     fileObj = open(pickle_file, 'rb')
 
@@ -139,8 +138,7 @@ def load_dataset():
     test_dataset = allDatabase['test_dataset']
     test_labels = allDatabase['test_labels']
 
-    print(type(train_labels))
-    print(train_labels.shape)
+    fileObj.close()
 
     train_x = shared(np.asarray(train_dataset, dtype=config.floatX), borrow=True)
     train_y = shared(np.asarray(train_labels, dtype=config.floatX), borrow=True)
