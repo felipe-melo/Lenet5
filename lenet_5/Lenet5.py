@@ -123,7 +123,6 @@ class Lenet5(object):
 
             for mini_batch_index in range(n_train_batches):
                 confu = self.train(mini_batch_index)
-                print(confu)
                 confucion_matrix += confu[0]
 
             print("epocha:", epoch, "accuracy:", confucion_matrix.diagonal().sum() / confucion_matrix.sum())
