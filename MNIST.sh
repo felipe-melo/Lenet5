@@ -1,6 +1,6 @@
 #!/bin/sh
 
-path_root=~/Desenvolvimento/ufrrj/TCC/Lenet5-TCC/
+path_root=~/Documentos/Felipe/Lenet5/
 
 #MNIST cpu
 #PYTHONPATH=$path_root THEANO_FLAGS='device=gpu' nvprof --metrics flop_count_sp,flop_sp_efficiency,flop_count_dp,flop_dp_efficiency --log-file outputs/mnist_cpu_flop.out python3 MNIST/__init__.py

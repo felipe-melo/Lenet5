@@ -17,7 +17,7 @@ def main():
     test_set_x, test_set_y = database[1]'''
 
     lenet5 = Lenet5()
-    lenet5.run_train(train_set_x, train_set_y, test_set_x, test_set_y, epochs=1)
+    lenet5.run_train(train_set_x, train_set_y, test_set_x, test_set_y, epochs=20)
 
 
 if "__main__" == __name__:
