@@ -226,6 +226,7 @@ def save_pickle_file(train_dataset, train_labels, valid_dataset, valid_labels, t
         print('Unable to save data to', pickle_file, ':', e)
         raise
 
+
 def create_dataset():
     train_filename = download_no_mnist('notMNIST_large.tar.gz', 247336696)
     test_filename = download_no_mnist('notMNIST_small.tar.gz', 8458043)
