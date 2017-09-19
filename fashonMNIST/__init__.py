@@ -1,4 +1,4 @@
-from MNIST.MNISTDataset import *
+from fashonMNIST.MNISTDataset import *
 from lenet_5.Lenet5 import Lenet5
 import sys
 

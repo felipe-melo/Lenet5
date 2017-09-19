@@ -10,10 +10,10 @@ import matplotlib.pyplot as plt
 from six.moves import cPickle as pickle
 
 
-train_images_file = Constants.dataset_root + "train-images.idx3-ubyte"
-train_labels_file = Constants.dataset_root + "train-labels.idx1-ubyte"
-test_images_file = Constants.dataset_root + "t10k-images.idx3-ubyte"
-test_labels_file = Constants.dataset_root + "t10k-labels.idx1-ubyte"
+train_images_file = Constants.dataset_root + "fashon_mnist/train-images-idx3-ubyte"
+train_labels_file = Constants.dataset_root + "fashon_mnist/train-labels-idx1-ubyte"
+test_images_file = Constants.dataset_root + "fashon_mnist/t10k-images-idx3-ubyte"
+test_labels_file = Constants.dataset_root + "fashon_mnist/t10k-labels-idx1-ubyte"
 
 
 def read_files(train_images=train_images_file, train_labels=train_labels_file, test_images=test_images_file,
@@ -75,7 +75,7 @@ def create_binary_files():
     _train_x, _train_y = __read_original_file__(train_images_file, train_labels_file)
     _test_x, _test_y = __read_original_file__(test_images_file, test_labels_file)
 
-    pickle_file = os.path.join(Constants.dataset_root, 'MNIST.pickle')
+    pickle_file = os.path.join(Constants.dataset_root, 'fashonMNIST.pickle')
 
     try:
         f = open(pickle_file, 'wb')
@@ -95,7 +95,7 @@ def create_binary_files():
 
 
 def plotingSomeImg():
-    pickle_file = os.path.join(Constants.dataset_root, 'MNIST.pickle')
+    pickle_file = os.path.join(Constants.dataset_root, 'fashonMNIST.pickle')
 
     fileObj = open(pickle_file, 'rb')
 
@@ -127,7 +127,7 @@ def plotingSomeImg():
 
 
 def load_dataset():
-    pickle_file = os.path.join(Constants.dataset_root, 'MNIST.pickle')
+    pickle_file = os.path.join(Constants.dataset_root, 'fashonMNIST.pickle')
 
     fileObj = open(pickle_file, 'rb')
 
