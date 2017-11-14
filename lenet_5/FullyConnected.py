@@ -1,7 +1,6 @@
 import numpy as np
 import theano.tensor as T
-from theano import shared, config, function
-from sklearn.metrics import f1_score
+from theano import shared, config
 
 
 class FullyConnected(object):
