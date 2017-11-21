@@ -112,7 +112,7 @@ class Lenet5(object):
             }
         )
 
-        print("trainning...")
+        print('{"trainning":{ "epochs": [')
         t1 = time.time()
 
         epoch = 0
@@ -125,11 +125,18 @@ class Lenet5(object):
                 confu = self.train(mini_batch_index)
                 confucion_matrix += confu[0]
 
-            print("epocha:", epoch, "accuracy:", confucion_matrix.diagonal().sum() / confucion_matrix.sum())
+            print('{"epoch"', ":{",
+                  '"accuracy":', (confucion_matrix.diagonal().sum() / confucion_matrix.sum()),
+                  ',"confusion_matrix": ', repr(confucion_matrix))
 
-        print("trainning time:", time.time() - t1)
+            if epoch < epochs:
+                print("}},")
+            else:
+                print("}}")
 
-        print("testing...")
+        print("],", '"time":', time.time() - t1, "},")
+
+        print('"testing":{')
         t1 = time.time()
         confucion_matrix = np.zeros((self.labels, self.labels), dtype='int')
 
@@ -137,15 +144,9 @@ class Lenet5(object):
             confu = self.test_model(i)
             confucion_matrix += confu[0]
 
+        print('"confusion_matrix": ', repr(confucion_matrix), ",")
+
         test_accuracy = confucion_matrix.diagonal().sum() / confucion_matrix.sum()
 
-        for i in range(self.labels):
-            precision = confucion_matrix[i, i] / (confucion_matrix[:, i].sum())
-            recall = confucion_matrix[i, i] / (confucion_matrix[i, :].sum())
-            f1_score = 2 * (precision * recall) / (precision + recall)
-            print("Precision class:", i, ":", precision)
-            print("Recall class:", i, ":", recall)
-            print("F1 score class:", i, ":", f1_score)
-
-        print("Epocha:", epoch, "test accuracy:", test_accuracy * 100, "%")
-        print("testing time", time.time() - t1)
+        print('"accuracy":', test_accuracy, ",")
+        print('"time":', time.time() - t1, "}}")
