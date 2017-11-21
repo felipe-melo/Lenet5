@@ -1,4 +1,4 @@
 class Constants(object):
 
-	dataset_root = "/home/hal/Documentos/Felipe/datasets/"
+	dataset_root = "/home/cooper/Desenvolvimento/ufrrj/Datasets/"
 
