@@ -1,10 +1,10 @@
 #!/bin/sh
 
-path_root=~/Desenvolvimento/ufrrj/TCC/Lenet5-TCC/
-epochs=1
+path_root=~/Documentos/Felipe/Lenet5/
+epochs=30
 
-#PYTHONPATH=$path_root nvprof --print-gpu-trace -u s --log-file outputs/notMNIST_gpu_time.out python3 notMNIST/__init__.py
+#GPU
+PYTHONPATH=$path_root nvprof --print-gpu-trace -u s --log-file outputs/notMNIST_cuda_profile.out python3 notMNIST/__init__.py $epochs > outputs/notMNIST_gpu.json
 
-PYTHONPATH=$path_root python3 notMNIST/__init__.py $epochs > outputs/notMNIST_gpu.out
-
-PYTHONPATH=$path_root THEANO_FLAGS='device=cpu' python3 notMNIST/__init__.py $epochs > outputs/notMNIST_cpu.out
+#cpu
+#PYTHONPATH=$path_root THEANO_FLAGS='device=cpu' python3 notMNIST/__init__.py $epochs > outputs/notMNIST_cpu.json
