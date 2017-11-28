@@ -9,15 +9,18 @@ class FullyConnected(object):
 
         #preciso ver como iniciar os valores do weight
         w = np.asarray(rng.uniform(
-            low=-np.sqrt(6. / (n_in + n_out)),
-            high=np.sqrt(6. / (n_in + n_out)),
+            low=-np.sqrt(1. / (n_in)),
+            high=np.sqrt(1. / (n_in)),
             size=(n_in, n_out)
         ), dtype=config.floatX)
 
         self.W = shared(value=w, name='W', borrow=True)
 
-        b = np.zeros((n_out,), dtype=config.floatX)
-        self.b = shared(value=b, name='b', borrow=True)
+        self.b = shared(
+            np.asarray(
+                np.random.normal(loc=0, scale=np.sqrt(1.0/n_in), size=(n_out,)),
+                dtype=config.floatX),
+            borrow=True, name='b')
 
         self.output = T.nnet.softmax(T.dot(_input, self.W) + self.b)
 

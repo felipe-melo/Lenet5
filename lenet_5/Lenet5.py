@@ -12,7 +12,7 @@ rng = np.random
 
 class Lenet5(object):
 
-    def __init__(self, batch_size=150, labels=10):
+    def __init__(self, batch_size=200, labels=10):
         self.x = T.matrix('x')
         self.y = T.ivector('y')
 
@@ -70,38 +70,25 @@ class Lenet5(object):
         self.train = None
         self.test_model = None
 
-    def run_train(self, train_dataset, train_labels, test_dataset, test_labels, valid_dataset=None, valid_labels=None,
-                  epochs=25, eta=0.3):
+    def run_train(self, train_dataset, train_labels, test_dataset, test_labels, t0, epochs=25, eta=0.3):
 
+        t1 = time.time()
         index = T.lscalar()
 
         n_train_batches = train_dataset.get_value(borrow=True).shape[0] // self.batch_size
         n_test_batches = test_dataset.get_value(borrow=True).shape[0] // self.batch_size
-        if valid_dataset is not None:
-            n_valid_batches = valid_dataset.get_value(borrow=True).shape[0] // self.batch_size
 
         updates = [(param_i, param_i - eta * grad_i) for param_i, grad_i in zip(self.params, self.grads)]
 
         self.train = function(
             inputs=[index],
             outputs=[self.f4.confusion_matrix(self.y)],
-            #outputs=[self.f4.output],
             updates=updates,
             givens={
                 self.x: train_dataset[index * self.batch_size:(index + 1) * self.batch_size],
                 self.y: train_labels[index * self.batch_size:(index + 1) * self.batch_size]
             }
         )
-
-        if valid_dataset is not None:
-            validate_model = function(
-                inputs=[index],
-                outputs=[self.f4.confusion_matrix(self.y)],
-                givens={
-                    self.x: valid_dataset[index * self.batch_size: (index + 1) * self.batch_size],
-                    self.y: valid_labels[index * self.batch_size: (index + 1) * self.batch_size]
-                }
-            )
 
         self.test_model = function(
             inputs=[index],
@@ -112,41 +99,31 @@ class Lenet5(object):
             }
         )
 
-        print('{"trainning":{ "epochs": [')
-        t1 = time.time()
+        print('{"trainning":{ ', '"loading_time":', t1-t0, ', "epochs": [')
 
         epoch = 0
         while epoch < epochs:
             epoch += 1
 
             confucion_matrix = np.zeros((self.labels, self.labels), dtype='int')
-
             for mini_batch_index in range(n_train_batches):
-                confu = self.train(mini_batch_index)
-                confucion_matrix += confu[0]
+                train_confu = self.train(mini_batch_index)
+                confucion_matrix += train_confu[0]
 
+            test_confucion_matrix = np.zeros((self.labels, self.labels), dtype='int')
+            for mini_batch_index in range(n_test_batches):
+                test_confu = self.test_model(mini_batch_index)
+                test_confucion_matrix += test_confu[0]
+            print(test_confucion_matrix.sum())
             print('{"epoch"', ":{",
-                  '"accuracy":', (confucion_matrix.diagonal().sum() / confucion_matrix.sum()),
-                  ',"confusion_matrix": ', repr(confucion_matrix))
+                  '"train_accuracy":', (confucion_matrix.diagonal().sum() / confucion_matrix.sum()),
+                  ',"test_accuracy":', (test_confucion_matrix.diagonal().sum() / test_confucion_matrix.sum()),
+                  ',"train_confusion_matrix": ', repr(confucion_matrix),
+                  ',"test_confusion_matrix": ', repr(test_confucion_matrix))
 
             if epoch < epochs:
                 print("}},")
             else:
                 print("}}")
 
-        print("],", '"time":', time.time() - t1, "},")
-
-        print('"testing":{')
-        t1 = time.time()
-        confucion_matrix = np.zeros((self.labels, self.labels), dtype='int')
-
-        for i in range(n_test_batches):
-            confu = self.test_model(i)
-            confucion_matrix += confu[0]
-
-        print('"confusion_matrix": ', repr(confucion_matrix), ",")
-
-        test_accuracy = confucion_matrix.diagonal().sum() / confucion_matrix.sum()
-
-        print('"accuracy":', test_accuracy, ",")
-        print('"time":', time.time() - t1, "}}")
+        print("],", '"time":', time.time() - t1, "}}")

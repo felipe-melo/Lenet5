@@ -13,7 +13,7 @@ class ConvPoolLayer(object):
         self.pool_size = pool_size
         self.activation_fn = activation_fn
 
-        #fan_in = np.prod(filter_shape[1:])
+        n_in = np.prod(filter_shape[1:])
         #fan_out = (filter_shape[0] * np.prod(filter_shape[2:])) / np.prod((2, 2))
         #w_bound = np.sqrt(6. / (fan_in + fan_out))
 
@@ -21,13 +21,13 @@ class ConvPoolLayer(object):
 
         self.W = shared(
             np.array(
-                rng.normal(loc=0, scale=np.sqrt(1.0/n_out), size=filter_shape),
+                rng.normal(loc=0, scale=np.sqrt(1.0/n_in), size=filter_shape),
                 dtype=config.floatX),
             borrow=True)
 
         self.bias = shared(
             np.asarray(
-                np.random.normal(loc=0, scale=1.0, size=(filter_shape[0],)),
+                np.random.normal(loc=0, scale=np.sqrt(1.0/n_in), size=(filter_shape[0],)),
                 dtype=config.floatX),
             borrow=True)
 
