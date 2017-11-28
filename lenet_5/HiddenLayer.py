@@ -8,8 +8,8 @@ class HiddenLayer(object):
 
         w_values = np.asarray(
             rng.uniform(
-                low=-np.sqrt(1. / (n_in)),
-                high=np.sqrt(1. / (n_in)),
+                low=-np.sqrt(6. / (n_in + n_out)),
+                high=np.sqrt(6. / (n_in + n_out)),
                 size=(n_in, n_out)
             ),
             dtype=config.floatX

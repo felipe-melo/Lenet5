@@ -2,13 +2,14 @@ from notMNIST.notMNISTDataset import download_no_mnist, maybe_extract, maybe_pic
     pickle, os, extract_overlap_hash_where, sanitize, save_pickle_file, plt, create_dataset, load_dataset
 from lenet_5.Lenet5 import Lenet5
 from util.Constants import Constants
-import sys
+import sys, time
 from theano import config
 
-os.environ["CUDA_LAUNCH_BLOCKING"] = "1" #Recomendado quando profile=True, deixa mais lento porém é mais preciso
-config.profile = True
-config.profiling.ignore_first_call = True
+#os.environ["CUDA_LAUNCH_BLOCKING"] = "1" #Recomendado quando profile=True, deixa mais lento porém é mais preciso
+#config.profile = True
+#config.profiling.ignore_first_call = True
 
+t0 = time.time()
 
 def my_test():
 
@@ -58,7 +59,7 @@ def main(_epochs):
     train_set_x, train_set_y, valid_x, valid_y, test_set_x, test_set_y = load_dataset()
 
     lenet5 = Lenet5()
-    lenet5.run_train(train_set_x, train_set_y, test_set_x, test_set_y, valid_dataset=valid_x, valid_labels=valid_y, epochs=_epochs)
+    lenet5.run_train(train_set_x, train_set_y, test_set_x, test_set_y, t0=t0, epochs=_epochs)
 
 
 if "__main__" == __name__:
