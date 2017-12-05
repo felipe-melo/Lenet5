@@ -10,12 +10,13 @@ import TimeData
 plt.rcdefaults()
 
 device = "980"
+database = "mnist"
 
 #Variáveis
 execution_data = {'DtoH': 0, 'Execução': 0, 'HtoD': 0, 'overhead': 0}
 
 if device == "980":
-    file = open("../../Resultados/30/GTX 980/mnist_cuda_profile.out", "r")
+    file = open("../../Resultados/30/GTX 980/%s_cuda_profile.out" % database, "r")
     cpu_time = TimeData.cpu_mnist_time_980
     gpu_time = TimeData.gpu_mnist_time_980
 elif device == "k40":

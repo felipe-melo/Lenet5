@@ -1,13 +1,12 @@
 import numpy as np
 import theano.tensor as T
-from theano import shared, config
+from theano import shared, config, function
 
 
 class FullyConnected(object):
 
     def __init__(self, rng, _input, n_in, n_out):
 
-        #preciso ver como iniciar os valores do weight
         w = np.asarray(rng.uniform(
             low=-np.sqrt(6. / (n_in + n_out)),
             high=np.sqrt(6. / (n_in + n_out)),
@@ -28,7 +27,7 @@ class FullyConnected(object):
 
         self.params = [self.W, self.b]
 
-    def errors(self, y):
+    def error(self, y):
         return T.mean(T.neq(self.y_pred, y))
 
     def confusion_matrix(self, y):

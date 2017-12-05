@@ -72,7 +72,6 @@ class Lenet5(object):
 
     def run_train(self, train_dataset, train_labels, test_dataset, test_labels, t0, epochs=25, eta=0.3):
 
-        t1 = time.time()
         index = T.lscalar()
 
         n_train_batches = train_dataset.get_value(borrow=True).shape[0] // self.batch_size
@@ -99,6 +98,8 @@ class Lenet5(object):
             }
         )
 
+        t1 = time.time()
+
         print('{"trainning":{ ', '"loading_time":', t1-t0, ', "epochs": [')
 
         epoch = 0
@@ -114,7 +115,7 @@ class Lenet5(object):
             for mini_batch_index in range(n_test_batches):
                 test_confu = self.test_model(mini_batch_index)
                 test_confucion_matrix += test_confu[0]
-            print(test_confucion_matrix.sum())
+
             print('{"epoch"', ":{",
                   '"train_accuracy":', (confucion_matrix.diagonal().sum() / confucion_matrix.sum()),
                   ',"test_accuracy":', (test_confucion_matrix.diagonal().sum() / test_confucion_matrix.sum()),

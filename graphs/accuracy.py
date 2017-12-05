@@ -7,7 +7,7 @@ import json
 import numpy as np
 
 
-device = "710M"
+device = "980"
 dataset = "mnist"
 
 if device == "980":
@@ -37,6 +37,9 @@ labels = ['Zero', 'Um', 'Dois', 'Três', 'Quatro', 'Cinco', 'Seis', 'Sete', 'Oit
 train_confusion_matrix = None
 test_confusion_matrix = None
 
+train_confusion_matrix_cpu = None
+test_confusion_matrix_cpu = None
+
 quant = len(cpu['trainning']['epochs'])
 
 for epoch in cpu['trainning']['epochs']:
@@ -44,15 +47,15 @@ for epoch in cpu['trainning']['epochs']:
     train_accuracies_cpu.append(float(epoch['train_accuracy']) * 100)
     test_accuracies_cpu.append(float(epoch['test_accuracy']) * 100)
 
-    train_confusion_matrix = np.asmatrix(epoch['train_confusion_matrix'])
-    test_confusion_matrix = np.asmatrix(epoch['test_confusion_matrix'])
+    train_confusion_matrix_cpu = np.asmatrix(epoch['train_confusion_matrix'])
+    test_confusion_matrix_cpu = np.asmatrix(epoch['test_confusion_matrix'])
     
     precisions = []
     recalls = []
 
-    for i in range(len(train_confusion_matrix)):
-        precisions.append(train_confusion_matrix[i, i] / (train_confusion_matrix[:, i].sum()))
-        recalls.append(train_confusion_matrix[i, i] / (train_confusion_matrix[i, :].sum()))
+    for i in range(len(train_confusion_matrix_cpu)):
+        precisions.append(train_confusion_matrix_cpu[i, i] / (train_confusion_matrix_cpu[:, i].sum()))
+        recalls.append(train_confusion_matrix_cpu[i, i] / (train_confusion_matrix_cpu[i, :].sum()))
 
     macroAvgPrecision = np.mean(precisions)
     macroAvgRecall = np.mean(recalls)
@@ -62,9 +65,9 @@ for epoch in cpu['trainning']['epochs']:
     precisions = []
     recalls = []
 
-    for i in range(len(test_confusion_matrix)):
-        precisions.append(test_confusion_matrix[i, i] / (test_confusion_matrix[:, i].sum()))
-        recalls.append(test_confusion_matrix[i, i] / (test_confusion_matrix[i, :].sum()))
+    for i in range(len(test_confusion_matrix_cpu)):
+        precisions.append(test_confusion_matrix_cpu[i, i] / (test_confusion_matrix_cpu[:, i].sum()))
+        recalls.append(test_confusion_matrix_cpu[i, i] / (test_confusion_matrix_cpu[i, :].sum()))
 
     macroAvgPrecision = np.mean(precisions)
     macroAvgRecall = np.mean(recalls)
@@ -170,9 +173,17 @@ def plot_confusion_matrix(cm, classes,
     pylab.xlabel('Valor real')
 
 pylab.figure()
-plot_confusion_matrix(train_confusion_matrix, classes=labels, title='Matriz de confusão (Treino)')
+plot_confusion_matrix(train_confusion_matrix, classes=labels, title='Matriz de confusão (Treino - GPU)')
 
 pylab.figure()
-plot_confusion_matrix(test_confusion_matrix, classes=labels, title='Matriz de confusão (Teste)')
+plot_confusion_matrix(test_confusion_matrix, classes=labels, title='Matriz de confusão (Teste - GPU)')
+
+pylab.figure()
+plot_confusion_matrix(train_confusion_matrix_cpu, classes=labels, title='Matriz de confusão (Treino - CPU)')
+
+pylab.figure()
+plot_confusion_matrix(test_confusion_matrix_cpu, classes=labels, title='Matriz de confusão (Teste - CPU)')
+
+pylab.show()
 
 pylab.show()
