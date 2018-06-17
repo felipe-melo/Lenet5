@@ -10,7 +10,7 @@ O trabalho foi implementado em python com uso das bibliotecas [numpy](http://www
 e envio de instruções para serem executadas em GPUs de maneira simples e bem transparente. Para execução em GPU é necessários que o drive da placa
 de vídeo esteja instalado bem como a biblioteca C [CUDA](https://developer.nvidia.com/cuda-zone).
 
-##Uso
+## Uso
 
 O dataset utilziado para este trabalho foi o [MNIST](http://yann.lecun.com/exdb/mnist/), famosa base com imagens de dígitos de 0 a 9, dentro do package MNIST
 no arquivo MNISTDataset.py[link], tem uma função, ```create_binary_files```, que cria um binário da base dados original, que deve estar
