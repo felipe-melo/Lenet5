@@ -18,13 +18,17 @@ presenta no caminho informado no arquivo [Constants](https://github.com/felipe-m
 
 Parte da configuração da execução do theano deve estar no arquivo /home/user/.theanorc como abaixo, dependendo da versão da placa de vídeo e da biblioteca theano
 
->* [global]
+```
+[global]
 floatX = float32
 device = cuda0
+
 [gpuarray]
 preallocate = 1
+
 [lib]
-cnmem = 0.75*
+cnmem = 0.75
+```
 
 Para execução foram criados arquivos .sh com os comandos e parâmetros para o código. Nos comandos de execução algumas diretivas de CUDA para captura de informações da
 execução podem ser usadas.
