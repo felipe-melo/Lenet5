@@ -21,10 +21,8 @@ Parte da configuração da execução do theano deve estar no arquivo /home/user
 >* [global]
 floatX = float32
 device = cuda0
-
 [gpuarray]
 preallocate = 1
-
 [lib]
 cnmem = 0.75*
 
